@@ -1,0 +1,42 @@
+import main.*
+
+describe "Pruebas de PDEP Entertainment" {
+
+  // instancias para las pruebas
+  const laRenga = new BandaRock(nombre = "La Renga", solosDeGuitarra = 3)
+  const facilB = new BandaTrap(nombre = "Fácil B", tieneHielo = true)
+  
+  const entradaLaRenga = new Entrada(banda = laRenga, fecha = new Date())
+  
+  const abonoVip10 = new AbonoVip(porcentajeDescuento = 0.10)
+  
+  const asistenteConSaldo = new Asistente(abono = abonoFan, dineroDisponible = 5000)
+  const asistenteSinSaldo = new Asistente(abono = abonoVip10, dineroDisponible = 0)
+
+  test "El precio al público de una entrada calcula base más impuesto" {
+    // 1000 base + 200 impuesto por defecto = 1200
+    assert.equals(1200, entradaLaRenga.precioAlPublico())
+  }
+
+  test "Un asistente con saldo positivo compra una entrada exitosamente" {
+    asistenteConSaldo.comprarEntrada(entradaLaRenga)
+    assert.equals(3800, asistenteConSaldo.dineroDisponible()) // 5000 - 1200
+    assert.equals(1, asistenteConSaldo.historialEntradas().size())
+  }
+
+  test "Un asistente sin saldo positivo no puede comprar y lanza una excepción" {
+    assert.throwsExceptionWithMessage(
+      "No puede comprar entradas porque no posee un saldo positivo.",
+      { asistenteSinSaldo.comprarEntrada(entradaLaRenga) }
+    )
+  }
+
+  test "La popularidad de una banda de rock es 100 veces la cantidad de solos" {
+    assert.equals(300, laRenga.popularidad())
+  }
+
+  test "El canon de una banda de trap depende de su popularidad" {
+    // tieneHielo = true -> popularidad = 1000 -> canon = 1000 * 1000000 = 1.000.000.000
+    assert.equals(1000000000, facilB.canon())
+  }
+}
